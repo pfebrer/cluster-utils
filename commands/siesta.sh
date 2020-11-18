@@ -18,5 +18,5 @@ siestasub(){
         fi
         SYSTEM=$(echo ${SYSTEM%.fdf})
 
-        jobsub -J "$SYSTEM" "$@" $SIESTA_RUN_SCRIPT $SYSTEM
+        SYSTEM=$SYSTEM jobsub -J "$SYSTEM" "$@" $SIESTA_RUN_SCRIPT
 }
