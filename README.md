@@ -44,7 +44,7 @@ There are two ways to call it:
 # Scripts
 
 Scripts that are provided by the package:
-- `run_siesta.sh`: Loads the appropiate environment (defined by `SIESTA_ENV_LOADER`, default to [scripts/load_intelsiesta.sh](scripts/load_intelsiesta.sh) and then runs siesta using the following environment variables:
+- `run_siesta.sh`: Loads the appropiate environment (defined by `SIESTA_ENV_LOADER`, default to [scripts/load_intelsiesta.sh](scripts/load_intelsiesta.sh)) and then runs siesta using the following environment variables:
   * `SIESTA`: Path to siesta, defaults to `siesta`.
   * `SYSTEM`: The name of the input fdf file, without extension.
 
