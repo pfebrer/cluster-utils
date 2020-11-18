@@ -1,0 +1,10 @@
+#!/bin/bash
+
+BASHRC=${BASHRC:-$HOME/.bashrc}
+ACTIVATE_SCRIPT="$(dirname $(realpath $BASH_SOURCE))"/activate
+
+echo "# Added by cluster-utils. Do not modify if you want automatic uninstall" >> $BASHRC
+echo "source $ACTIVATE_SCRIPT" >> $BASHRC
+echo "# End of cluster-utils" >> $BASHRC
+
+source $ACTIVATE_SCRIPT

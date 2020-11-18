@@ -1,0 +1,8 @@
+#!/bin/bash
+
+BASHRC=${BASHRC:-$HOME/.bashrc}
+
+startline="# Added by cluster-utils. Do not modify if you want automatic uninstall"
+endline="# End of cluster-utils"
+
+sed -i "/$startline/,/$endline/d" $BASHRC
