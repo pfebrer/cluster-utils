@@ -12,6 +12,7 @@ siestasub(){
                         included=$(echo ${included/"%include"/})
                         SYSTEM=${SYSTEM/$included/}
                 done
+		echo $SYSTEM will be used as the input fdf.
         else
                 SYSTEM=$1
                 shift
