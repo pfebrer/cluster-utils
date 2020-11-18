@@ -1,6 +1,7 @@
 #!/bash/bin
 
 siestasub(){
+	SIESTA_RUN_SCRIPT=${SIESTA_RUN_SCRIPT:-"$CLUSTER_UTILS_ROOT"/scripts/run_siesta.sh}
 	# Get the fdf file name 
         if [ $# == 0 ] || [[ ! "$(ls *.fdf)" =~ "$1" ]];
         then
@@ -17,5 +18,5 @@ siestasub(){
         fi
         SYSTEM=$(echo ${SYSTEM%.fdf})
 
-        jobsub -J "$SYSTEM" "$@" $CLUSTER_UTILS_ROOT/scripts/run_siesta.sh $SYSTEM
+        jobsub -J "$SYSTEM" "$@" $SIESTA_RUN_SCRIPT $SYSTEM
 }
