@@ -1,4 +1,6 @@
-# Have you ever gone crazy trying to remember all the ways in which your different clusters work?
+# Some people do yoga, others use `cluster-utils`
+
+*Have you ever gone crazy trying to remember all the ways in which your different clusters work?*
 
 *And after the assigned period ends, you will need to use a different one.*
 
