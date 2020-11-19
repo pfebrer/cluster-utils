@@ -4,6 +4,8 @@
 
 *And after the assigned period ends, you will need to use a different one.*
 
+![](https://sa1s3optim.patientpop.com/assets/images/provider/photos/2125909.jpg)
+
 `cluster-utils` is a set of utilities to make your life easier with hpc clusters. The main goal is that you can use the **same interface for all clusters that you work on**, while helping you keep your **workspace clean**.
 
 It consists of mainly three parts:
