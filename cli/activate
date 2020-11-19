@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Define the clusterutils command interface, which just basically looks for
+# subcommands in the subcommands directory
+clusterutils(){
+
+	local comm=bash
+	if [ "$1" == "--source" ];then
+		local comm=source
+		shift
+	fi
+
+	local what=$1
+        shift
+
+	$comm "${CLUSTER_UTILS_ROOT}/cli/subcommands/${what}" "$@"
+        
+}
+export -f clusterutils
+
+# Provide an autocompletion function for clusterutils
+_complete_clusterutils(){
+
+	local current="${COMP_WORDS[COMP_CWORD]}"
+
+	case "${COMP_CWORD}" in
+		1)
+			# Get the list of (public) subcommands
+        		COMPREPLY=($(cd $(clusterutils path cli/subcommands); ls "$current"* 2>/dev/null))
+		;;
+		*)
+			# Return default completion options (list directory)
+			COMPREPLY=($(compgen -f "$current"))
+	esac
+}
+complete -F _complete_clusterutils clusterutils

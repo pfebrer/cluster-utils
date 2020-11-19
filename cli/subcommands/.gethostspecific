@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# What does the user want (a runner script, an env loader, etc...)
+what=$1
+
+# Call .parsedir, which will define the following variables:
+# $directory, $userdirectory, $prefix
+clusterutils --source .parsedir "$what"
+
+# Define all the candidates (the order of the candidates matter)
+# The order defined here is:
+# 	1. User directory, cluster-specific
+#	2. Cluster-utils provided, cluster-specific
+#	3. User directory, generic
+#	4. Cluster-utils provided, generic.
+#	5. spec provided was a full path to the file
+candidates+=" ${userdirectory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh"
+candidates="$(clusterutils path ${directory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh)"
+candidates+=" ${userdirectory}/${prefix}_$2.sh"
+candidates+=" $(clusterutils path ${directory}/${prefix}_$2.sh)"
+candidates+=" $2"
+
+winner=
+
+for candidate in $candidates; do
+	if [ -f $candidate ]; then
+		winner=$candidate
+		break
+	fi
+done
+
+clusterutils report debug "Requested ${what} <$2> on ${CLUSTER_UTILS_HOST}. Found: ${winner}. Candidates were: ${candidates}"
+
+echo $winner

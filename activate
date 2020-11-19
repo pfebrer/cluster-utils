@@ -1,7 +1,19 @@
 #!/bin/bash
 
+# Define the root so that everybody knows how to access files in the cluster-utils package
 export CLUSTER_UTILS_ROOT=$(dirname $(realpath $BASH_SOURCE))
 
-for f in $CLUSTER_UTILS_ROOT/commands/*; do
+# Activate the clusterutils cli
+source "$CLUSTER_UTILS_ROOT"/cli/activate
+
+# Define also the place where the user scripts are expected to be
+# (can be overwritten)
+export CLUSTER_UTILS_USERSCRIPTS=$(clusterutils path user-scripts)
+
+# Define the name of the host where we are running cluster-utils
+export CLUSTER_UTILS_HOST=$(clusterutils gethost)
+
+# Source all the files that contain commands to make them accessible
+for f in $(clusterutils path commands/*); do
 	source $f
 done 

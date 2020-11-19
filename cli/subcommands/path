@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo ${CLUSTER_UTILS_ROOT}/"$1"

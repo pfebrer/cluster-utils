@@ -1,0 +1,15 @@
+#!/bin/bash
+
+env_loader=$(clusterutils getenvloader $1)
+
+if [[ -z "${env_loader// }" ]]; then
+        clusterutils report "Loading environment <$1> from ${env_loader}..."
+        source $env_loader
+        if $?; 
+	then clusterutils report "Succeeded." 
+        else clusterutils report "Failed"
+	fi
+else
+        clusterutils report "No environment loader was found for <$1>"
+fi
+

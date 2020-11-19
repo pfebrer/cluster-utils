@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo $(clusterutils .gethostspecific runner "$1")

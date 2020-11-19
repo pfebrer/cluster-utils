@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ENV_LOADER=${SIESTA_ENV_LOADER:-$CLUSTER_UTILS_ROOT/scripts/load_intelsiesta.sh}
 source $ENV_LOADER
 
 ulimit -l unlimited

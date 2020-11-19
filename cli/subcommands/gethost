@@ -1,0 +1,5 @@
+#!/bin/bash
+
+HOSTNAME=$(hostname)
+
+clusterutils .parsehost $HOSTNAME

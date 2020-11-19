@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo $(clusterutils .gethostspecific env_loader "$1")
