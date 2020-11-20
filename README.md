@@ -17,6 +17,8 @@ Different clusters are (brace yourself) very different in their specifications (
 - The core of `cluster-utils` (i.e. commands and CLI) is written in shell scripts that focus on **sticking to the most standard things**.
 - The package installation **doesn't require any permission**. It only adds one line to `~/.bashrc` to trigger its activation when you login. (in case you aren't even allowed to write to your home directory, we recommend you to start a revolution).
 
+# Make it personal
+
 We also acknowledge that **you may have special needs that are not fulfilled by the provided scripts**. That's why the `CLUSTER_UTILS_USERSCRIPTS` environment variable [is defined](activate), which points to a folder that needs to have the same structure as [the scripts folder](scripts). When looking for scripts, `cluster-utils` will **prefer the ones that you have defined over the provided ones if it finds them**. 
 
 By default, the user specific folder is expected to be in the first level of the package as `user-scripts`. The reason for this is that there should be a "clean" version of `cluster-utils`, which we all share (https://github.com/pfebrer/cluster-utils/master) and then a branch for each person, where `user-scripts` is defined. In this way you can **keep your personalized version on github** (to instantly clone it to/update it from any cluster, keeping all of them in sync) **without interfering with the main version**.
