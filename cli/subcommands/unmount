@@ -1,0 +1,6 @@
+#!/bin/bash
+
+HOST="$1"
+MOUNT_DIR=${CLUSTER_UTILS_MOUNTS}/${HOST}
+
+fusermount -u "${MOUNT_DIR}"

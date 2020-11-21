@@ -1,0 +1,15 @@
+#!/bin/bash
+
+HOST=$1
+
+# Remove from the Host definition to the next empty line
+sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config 
+
+# If the cluster was mounted then unmmount it
+clusterutils unmount "${HOST}"
+
+# Then, if the cluster mountpoint is empty (succesful unmount), remove it
+# NOTE that rmdir fails if the directory is not empty, we should never use rm -r here,
+# because it may remove all the files in the cluster!!!!!!!
+MOUNT_POINT="${CLUSTER_UTILS_MOUNTS}/${HOST}"
+rmdir "$MOUNT_POINT"

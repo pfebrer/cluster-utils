@@ -13,6 +13,9 @@ export CLUSTER_UTILS_USERSCRIPTS=$(clusterutils path user-scripts)
 # Define the name of the host where we are running cluster-utils
 export CLUSTER_UTILS_HOST=$(clusterutils gethost)
 
+# Define the place where, by default, cluster-utils will mount clusters
+export CLUSTER_UTILS_MOUNTS=$(clusterutils path mounts)
+
 # Source all the files that contain commands to make them accessible
 for f in $(clusterutils path commands/*); do
 	source $f

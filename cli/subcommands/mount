@@ -1,0 +1,9 @@
+#!/bin/bash
+
+HOST="$1"
+shift
+MOUNT_DIR=${CLUSTER_UTILS_MOUNTS}/${HOST}
+
+mkdir -p "$MOUNT_DIR"
+
+sshfs -o ServerAliveInterval=5,ServerAliveCountMax=2,ConnectTimeout=3,ConnectionAttempts=1 "$@" "${HOST}": "${MOUNT_DIR}"

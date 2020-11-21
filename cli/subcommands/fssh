@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Get the name of the host
+from_mounts=$(realpath --relative-to $CLUSTER_UTILS_MOUNTS $PWD)
+HOST=${from_mounts%%/*}
+
+# Get the mountdir of this host
+MOUNT_DIR=$(clusterutils .getmountdir "${HOST}")
+
+# Now get the equivalent dir on the host
+REMOTE_DIR="$(realpath --relative-to=$MOUNT_DIR $PWD)"
+
+# And finally ssh into the directory of the host
+ssh "${HOST}" -t "bash --init-file <(echo \". \$HOME/.bashrc; cd ${REMOTE_DIR}\")" "$@"
+
