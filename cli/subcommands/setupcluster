@@ -1,0 +1,43 @@
+#!/bin/bash
+
+sshconfig=~/.ssh/config
+current_user=$(logname)
+
+echo "------------------------------------"
+echo ""
+echo " Please fill in the following fields:"
+echo ""
+
+read -p " - Host: " host
+read -p " - User ($current_user): " user
+read -p " - HostName (optional): " hostname
+
+echo "" >> $sshconfig
+echo "Host $host" >> $sshconfig
+echo "  User ${user:-${current_user}}" >> $sshconfig
+if [ ! -z $hostname ]; then
+	echo "  HostName $hostname" >> $sshconfig
+fi
+echo "" >> $sshconfig
+
+echo ""
+echo " Host ${host} added to ${sshconfig}."
+echo ""
+echo "------------------------------------"
+
+echo ""
+echo " We are going to set up the ssh keys now"
+echo ""
+
+clusterutils sendkeys "${host}"
+
+echo "------------------------------------"
+echo ""
+echo " HEY! It's CLUSTER-UTILS again!"
+echo ""
+echo " If something has gone wrong, you can try to send the keys again with:"
+echo "     clusterutils sendkeys ${host}"
+echo " Otherwise, you are ready to mount the host to the filesystem with"
+echo "     clusterutils mount ${host}"
+echo ""
+

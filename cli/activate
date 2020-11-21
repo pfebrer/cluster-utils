@@ -6,15 +6,28 @@ clusterutils(){
 
 	local comm=bash
 	if [ "$1" == "--source" ];then
-		local comm=source
+		comm=source
 		shift
 	fi
+	local subdir=subcommands
+	if [ "$1" == "--completion" ];then
+                subdir=completions
+                shift
+        fi
+
 
 	local what=$1
         shift
 
-	$comm "${CLUSTER_UTILS_ROOT}/cli/subcommands/${what}" "$@"
-        
+	local file="${CLUSTER_UTILS_ROOT}/cli/${subdir}/${what}"
+
+	if [[ -f "$file" ]]; then
+		$comm "$file" "$@"
+	else
+		echo "Subcommand ${what} doesn't exist. Here's a list of valid subcommands:"
+		echo ""
+		ls $(clusterutils path cli/subcommands)
+	fi
 }
 export -f clusterutils
 
@@ -22,6 +35,7 @@ export -f clusterutils
 _complete_clusterutils(){
 
 	local current="${COMP_WORDS[COMP_CWORD]}"
+	local previous="${COMP_WORDS[COMP_CWORD-1]}"
 
 	case "${COMP_CWORD}" in
 		1)
@@ -30,7 +44,7 @@ _complete_clusterutils(){
 		;;
 		*)
 			# Return default completion options (list directory)
-			COMPREPLY=($(compgen -f "$current"))
+			COMPREPLY=($(clusterutils --completion "${COMP_WORDS[1]}"))
 	esac
 }
 complete -F _complete_clusterutils clusterutils

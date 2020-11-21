@@ -1,0 +1,3 @@
+#/bin/bash
+
+echo $(ls "${CLUSTER_UTILS_MOUNTS}")
