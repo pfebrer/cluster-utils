@@ -1,6 +1,16 @@
 #!/bin/bash
 
 HOST="$1"
-MOUNT_DIR=${CLUSTER_UTILS_MOUNTS}/${HOST}
 
-fusermount -u "${MOUNT_DIR}"
+if [ "${HOST}" == "--all" ]; then
+	# Go through all mount points and unmount them all
+	for host in $(clusterutils lsmounts); do
+		clusterutils unmount "${host}"
+	done
+else
+	# Unmount the host
+	MOUNT_DIR="${CLUSTER_UTILS_MOUNTS}/${HOST}"
+
+	fusermount -u "${MOUNT_DIR}"
+fi
+

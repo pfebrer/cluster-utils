@@ -24,9 +24,11 @@ clusterutils(){
 	if [[ -f "$file" ]]; then
 		$comm "$file" "$@"
 	else
-		echo "Subcommand ${what} doesn't exist. Here's a list of valid subcommands:"
-		echo ""
-		ls $(clusterutils path cli/subcommands)
+		if [ ! $subdir == "completions" ]; then
+			echo "Subcommand ${what} doesn't exist. Here's a list of valid subcommands:"
+			echo ""
+			ls $(clusterutils path cli/subcommands)
+		fi
 	fi
 }
 export -f clusterutils
