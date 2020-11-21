@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# It is EXTREMELY IMPORTANT that we define the following alias, 
+# since it will prevent accidental removal of all the files inside a mount.
+# Without this protection, if one does "rm -r mounts/" and "mounts" contains 
+# a mounted cluster, it would be catastrophic, as it would remove all the
+# contents inside a cluster
+# Note that we implement the extra protection of removing write permissions
+# from the directory where all the mounts are, which will ask you if 
+# you are sure to continue your recursive search (check cli/subcommands/mount).
+alias rm="rm --one-file-system"
+# Then we do this little trick so that sudo also sees the alias
+# (check out https://askubuntu.com/a/22043)
+alias sudo="sudo "
+
 # Define the root so that everybody knows how to access files in the cluster-utils package
 export CLUSTER_UTILS_ROOT=$(dirname $(realpath $BASH_SOURCE))
 

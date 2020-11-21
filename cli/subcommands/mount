@@ -4,6 +4,27 @@ HOST="$1"
 shift
 MOUNT_DIR=${CLUSTER_UTILS_MOUNTS}/${HOST}
 
-mkdir -p "$MOUNT_DIR"
+if [ ! -d "${MOUNT_DIR}" ]; then
+	# Make sure the mounts directory exists and set write permissions
+	# Check the line where we unset them below for the explanation.
+	mkdir -p "${CLUSTER_UTILS_MOUNTS}"
+	chmod +w "${CLUSTER_UTILS_MOUNTS}"
+
+	# Make the actual mountpoint for this cluster
+	mkdir -p "${MOUNT_DIR}"
+
+fi
+
+# As a safety measure, we unset writing permissions for the directory
+# where we store all the mounts. A recursive search that finds the directory
+# will protect the mountpoints, but NOT THE CONTENTS of the mountpoint.
+# However, it will at least prompt you to check if you are sure to continue
+# the recursive search down the path.
+# This is not the main safety measure (check the definition of "rm" alias
+# on the main "activate" script), but it's a nice addition. You are never too
+# safe when it comes to your scientific work!
+# We do this here outside the if statement just in case the user had previously
+# created the directory but this is the first time cluster-utils uses it.
+chmod -w "${CLUSTER_UTILS_MOUNTS}"
 
 sshfs -o ServerAliveInterval=5,ServerAliveCountMax=2,ConnectTimeout=3,ConnectionAttempts=1 "$@" "${HOST}": "${MOUNT_DIR}"

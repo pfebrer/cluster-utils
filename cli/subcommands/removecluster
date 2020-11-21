@@ -1,6 +1,16 @@
 #!/bin/bash
 
-HOST=$1
+HOST="$1"
+
+if [ "${HOST}" == "--all" ]; then
+	# Go through all the mounted clusters and remove them all
+	# This does not account for clusters that have never been mounted
+	for host in $(clusterutils lsmounts); do
+		clusterutils removecluster "${host}"
+	done
+
+	exit 0
+fi
 
 # Remove from the Host definition to the next empty line
 sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config 
@@ -8,8 +18,16 @@ sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config
 # If the cluster was mounted then unmmount it
 clusterutils unmount "${HOST}"
 
+MOUNT_POINT="${CLUSTER_UTILS_MOUNTS}/${HOST}"
+
+# Temporarily set the write permissions for the mounts directory
+# so that the mount point can be deleted
+chmod +w "${CLUSTER_UTILS_MOUNTS}"
+
 # Then, if the cluster mountpoint is empty (succesful unmount), remove it
 # NOTE that rmdir fails if the directory is not empty, we should never use rm -r here,
 # because it may remove all the files in the cluster!!!!!!!
-MOUNT_POINT="${CLUSTER_UTILS_MOUNTS}/${HOST}"
 rmdir "$MOUNT_POINT"
+
+# Then remove write permissions again
+chmod -w "${CLUSTER_UTILS_MOUNTS}"

@@ -1,8 +1,35 @@
 #!/bin/bash
 
-BASHRC=${BASHRC:-$HOME/.bashrc}
+echo ""
+echo "Unmounting all clusters..."
+# Remove all clusters safely
+clusterutils removecluster --all
 
-startline="# Added by cluster-utils. Do not modify if you want automatic uninstall"
-endline="# End of cluster-utils"
+# Remove the mounts directory
+chmod +w "${CLUSTER_UTILS_MOUNTS}"
+# Even though we unmounted all the clusters and there is already
+# an alias defined for rm, we will use "--one-file-system" to really really
+# really make sure that we are not deleting any content of a cluster
+rm -r --one-file-system "${CLUSTER_UTILS_MOUNTS}"
 
-sed -i "/$startline/,/$endline/d" $BASHRC
+if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
+	# Remove the activation script from .bashrc
+	BASHRC=${BASHRC:-$HOME/.bashrc}
+
+	startline="# Added by cluster-utils. Do not modify if you want automatic uninstall"
+	endline="# End of cluster-utils"
+
+	sed -i "/$startline/,/$endline/d" $BASHRC
+
+	echo ""
+	echo "Succesful uninstall!"
+	echo ""
+else
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	echo " UNINSTALL ERROR: Some clusters are still mounted"
+	echo " even though we tried to automatically unmount them."
+	echo " Please manually unmount all of them and then remove the"
+	echo " mounts folder:"
+	echo "     ${CLUSTER_UTILS_MOUNTS}"
+       	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"	
+fi
