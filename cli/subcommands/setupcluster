@@ -87,4 +87,3 @@ else
 	echo " You can try to send the keys again with:"
 	echo "     clusterutils sendkeys ${host}"
 fi
-

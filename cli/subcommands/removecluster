@@ -4,6 +4,7 @@ HOST="$1"
 
 if [ "${HOST}" == "--all" ]; then
 	# Go through all the mounted clusters and remove them all
+
 	for host in $(clusterutils lsclusters); do
 		clusterutils removecluster "${host}"
 	done
