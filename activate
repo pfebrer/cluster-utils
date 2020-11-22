@@ -33,3 +33,8 @@ export CLUSTER_UTILS_MOUNTS=$(clusterutils path mounts)
 for f in $(clusterutils path commands/*); do
 	source $f
 done 
+
+# Source all the helpers
+for f in $(clusterutils path helpers/*); do
+	source $f
+done

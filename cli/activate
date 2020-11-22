@@ -45,8 +45,8 @@ _complete_clusterutils(){
         		COMPREPLY=($(cd $(clusterutils path cli/subcommands); ls "$current"* 2>/dev/null))
 		;;
 		*)
-			# Return default completion options (list directory)
-			COMPREPLY=($(clusterutils --completion "${COMP_WORDS[1]}"))
+			# Return specific completions for the subcommand
+			COMPREPLY=($(clusterutils --completion "${COMP_WORDS[1]}" ${COMP_WORDS[@]} ${current:-<<}))
 	esac
 }
 complete -F _complete_clusterutils clusterutils

@@ -4,6 +4,14 @@ HOST="$1"
 shift
 MOUNT_DIR=${CLUSTER_UTILS_MOUNTS}/${HOST}
 
+if [ "${HOST}" == "--all" ]; then
+	# Go through all clusters and mount them all
+	for host in $(clusterutils lsclusters); do
+		clusterutils mount "${host}"
+	done
+	exit
+fi
+
 if [ ! -d "${MOUNT_DIR}" ]; then
 	# Make sure the mounts directory exists and set write permissions
 	# Check the line where we unset them below for the explanation.

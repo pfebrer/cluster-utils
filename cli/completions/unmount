@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "$(clusterutils lsmounts)"
+compgen -W "$(clusterutils lsmounts)" ${!#%%<<}
+

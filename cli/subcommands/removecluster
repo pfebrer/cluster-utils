@@ -4,21 +4,24 @@ HOST="$1"
 
 if [ "${HOST}" == "--all" ]; then
 	# Go through all the mounted clusters and remove them all
-	# This does not account for clusters that have never been mounted
-	for host in $(clusterutils lsmounts); do
+
+	for host in $(clusterutils lsclusters); do
 		clusterutils removecluster "${host}"
 	done
-
 	exit 0
 fi
 
-# Remove from the Host definition to the next empty line
-sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config 
+# 1. SSH config: Remove from the Host definition to the next empty line
+sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config
+
+# 2. Clusters YAML: Remove all the config for the host
+clusterutils .removeyamlcluster "${HOST}"
+
+# 3. Cluster mountpoint: Remove it if it was set up
+MOUNT_POINT="${CLUSTER_UTILS_MOUNTS}/${HOST}"
 
 # If the cluster was mounted then unmmount it
 clusterutils unmount "${HOST}"
-
-MOUNT_POINT="${CLUSTER_UTILS_MOUNTS}/${HOST}"
 
 # Temporarily set the write permissions for the mounts directory
 # so that the mount point can be deleted
