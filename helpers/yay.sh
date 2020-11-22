@@ -171,12 +171,11 @@ yay_parse() {
       if (length(value) > 0) {
          # value
          printf("%s%s[%s]=\"%s\";\n", prefix, parent_key , key, value);
-         printf("%s%s[keys]+=\" %s\";\n", prefix, parent_key , key);
       } else {
       	 keys[indent] = joined
          key = joined
          # collection
-         printf("%s%s[children]+=\" %s%s\";\n", prefix, parent_key , root_prefix, key);
+         printf("%s%s[children]+=\" %s%s\";\n", prefix, parent_key, root_prefix, key);
          printf("declare -g -A %s%s;\n", root_prefix, key);
          printf("%s%s[parent]=\"%s%s\";\n", root_prefix, key, prefix, parent_key);
       }
