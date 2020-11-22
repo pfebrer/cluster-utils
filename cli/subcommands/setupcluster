@@ -8,37 +8,55 @@ echo ""
 echo " Please fill in the following fields:"
 echo ""
 
-read -p " - Host: " host
-read -p " - User ($current_user): " user
-read -p " - HostName (optional): " hostname
+read_ifnotdef(){
+	if [ -z ${!2} ]; then
+		read -p "$1" "$2"
+	else
+		echo "$1: ${!2}"
+	fi
+}
 
+read_ifnotdef " - Host: " host
+read_ifnotdef " - User ($current_user): " user
+user=${user:-${current_user}}
+read_ifnotdef " - HostName (optional): " hostname
+
+# Write it to the ssh config file
 echo "" >> $sshconfig
 echo "Host $host" >> $sshconfig
-echo "  User ${user:-${current_user}}" >> $sshconfig
-if [ ! -z $hostname ]; then
+echo "  User ${user}" >> $sshconfig
+if [ ! -z "${hostname}" ]; then
 	echo "  HostName $hostname" >> $sshconfig
 fi
 echo "" >> $sshconfig
 
+clusters_yaml=$(clusterutils path "clusters.yaml")
+
+# Write the cluster into the yaml clusters file
+echo "${host}:" >> ${clusters_yaml}
+for var in user hostname; do
+	if [ -z ${!var} ]; then 
+		echo "  ${var}: ${!var}"
+	fi
+done	
+
 echo ""
-echo " Host ${host} added to ${sshconfig}."
+echo " Host ${host} added to ${sshconfig} and ${clusters_yaml}."
 echo ""
 echo "------------------------------------"
 
 echo ""
-echo " We are going to set up the ssh keys now"
+echo " We are going to set up the ssh keys now..."
 echo ""
 
-clusterutils sendkeys "${host}"
-
-echo "------------------------------------"
-echo ""
-echo " HEY! It's CLUSTER-UTILS again!"
-echo ""
-echo " If something has gone wrong and you can't \"ssh ${host}\" without password,"
-echo " you can try to send the keys again with:"
-echo "     clusterutils sendkeys ${host}"
-echo " Otherwise, you are ready to mount the host to the filesystem with"
-echo "     clusterutils mount ${host}"
-echo ""
+if clusterutils sendkeys "${host}"; then 
+	echo " APPARENTLY, EVERYTHING WENT FINE :)"
+	echo " You should be ready to mount the host to the filesystem with"
+	echo "     clusterutils mount ${host}"
+else
+	echo " LOOKS LIKE SOMETHING HAS GONE WRONG :("
+	echo " Look at the errors above to understand why." 
+	echo " You can try to send the keys again with:"
+	echo "     clusterutils sendkeys ${host}"
+fi
 

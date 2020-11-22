@@ -10,7 +10,9 @@ if [ "${HOST}" == "--all" ]; then
 else
 	# Unmount the host
 	MOUNT_DIR="${CLUSTER_UTILS_MOUNTS}/${HOST}"
-
-	fusermount -u "${MOUNT_DIR}"
+	
+	if fusermount -u "${MOUNT_DIR}"; then
+		echo "Succesfully unmounted ${HOST}"
+	fi
 fi
 

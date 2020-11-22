@@ -15,3 +15,5 @@ echo " It's time to send the key to the host, you will be prompt (for the last t
 echo ""
 
 ssh-copy-id "$1"
+
+exit $?
