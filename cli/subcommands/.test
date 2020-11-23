@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# -------------------------------------------------
+#      Define a fake server to run ssh tests
+# -------------------------------------------------
+# The server is hosted at localhost, port 2222
+# And you can login passwordless to it's root user
+# E.g.: ssh root@localhost -p 2222
+#
+# NOTE: This will only work if the system in which the
+# tests run has docker installed. Otherwise, all
+# tests that connect to the fake server are expected
+# to fail.
+
+echo
+echo "Creating a fake server to test ssh functionalities..."
+# Forget the previous localhost:2222, otherwise ssh will complain
+# that it has changed
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222" >/dev/null 2>/dev/null
+	
+#sudo chmod 666 /var/run/docker.sock
+
+# Create an auth_keys file that will be mounted to /root/.ssh/authorized_keys
+# so that we have permission to login (see https://github.com/panubo/docker-sshd)
+auth_keys=$(clusterutils path fakeserver_auth_keys)
+cat ~/.ssh/id_rsa.pub > ${auth_keys}
+
+# Run the fakeserver (https://github.com/kabirbaidhya/fakeserver) docker image
+docker run -d -p 2222:22 -v "${auth_keys}:/root/.ssh/authorized_keys" -e SSH_USERS="tester:1001:1001" -e SSH_ENABLE_ROOT=true --name fakeserver kabirbaidhya/fakeserver >/dev/null
+
+# ----------------------------------------------
+#  Create a copy of the repository for testing
+# ----------------------------------------------
+
+testpath=$(clusterutils path ../.test_cluster-utils)
+echo
+echo "Copying clusterutils to ${testpath}..."
+rm -r --one-file-system "${testpath}" 2>/dev/null
+
+if [ ! -d ${testpath} ]; then
+	mkdir "${testpath}"
+	cd ${CLUSTER_UTILS_ROOT}
+	# Avoid copying mounts and config files, as well as git files and dirs
+	cp -r activate install uninstall cli commands scripts helpers tests "${testpath}"
+else
+	echo "${testpath} is not empty, please remove it safely so that we can run the tests"
+	exit
+fi
+
+echo
+echo " LET'S RUN THE TESTS!"
+echo "------------------------------------------------------"
+# -------------------------------------------------
+#  	       Actually run the tests
+# -------------------------------------------------
+
+source "${testpath}/activate"
+
+shpec $(clusterutils path "tests/*.sh")
+tests_exit_code=$?
+
+# --------------------------------------------------
+#                     Clean up
+# --------------------------------------------------
+echo "------------------------------------------------------"
+echo
+echo "Cleaning up after tests..."
+
+# Docker related
+docker container stop fakeserver && docker container rm fakeserver >/dev/null
+
+rm -f "${auth_keys}"
+
+# Remove test folder
+rm -r ${testpath}
+
+exit ${tests_exit_code}

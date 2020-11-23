@@ -1,16 +1,15 @@
 #!/bin/bash
 
 echo ""
-echo "Unmounting all clusters..."
+echo "Unmounting and removing all clusters..."
 # Remove all clusters safely
 clusterutils removecluster --all
 
 # Remove the mounts directory
-chmod +w "${CLUSTER_UTILS_MOUNTS}"
-# Even though we unmounted all the clusters and there is already
-# an alias defined for rm, we will use "--one-file-system" to really really
-# really make sure that we are not deleting any content of a cluster
-rm -r --one-file-system "${CLUSTER_UTILS_MOUNTS}"
+# This will only be possible if the directory is empty, in which case
+# write permissions are already granted (see last lines of the
+# removecluster subcommand)
+rmdir ${CLUSTER_UTILS_MOUNTS}
 
 if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
 	# Remove the activation script from .bashrc

@@ -13,6 +13,8 @@ fi
 
 # 1. SSH config: Remove from the Host definition to the next empty line
 sed -i "/\<Host ${HOST}\>/,/^$/d" ~/.ssh/config
+# Make sure we don't leave repeated empty lines
+sed -i '/^$/N;/^\n$/D' ~/.ssh/config 
 
 # 2. Clusters YAML: Remove all the config for the host
 clusterutils .removeyamlcluster "${HOST}"
@@ -32,5 +34,9 @@ chmod +w "${CLUSTER_UTILS_MOUNTS}"
 # because it may remove all the files in the cluster!!!!!!!
 rmdir "$MOUNT_POINT"
 
-# Then remove write permissions again
-chmod -w "${CLUSTER_UTILS_MOUNTS}"
+# Then remove write permissions again in case there are more mountpoints
+# If there are not, there is nothing to protect, so we will make it easier to
+# delete.
+if [ ! -z "$(clusterutils lsmounts)"]; then
+	chmod -w "${CLUSTER_UTILS_MOUNTS}"
+fi
