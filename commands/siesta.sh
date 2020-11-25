@@ -7,12 +7,14 @@ siestasub(){
 	# Get the fdf file name 
         if [ $# == 0 ] || [[ ! "$(ls *.fdf)" =~ "$1" ]];
         then
-                local fdfs=$(ls *.fdf)
-                local SYSTEM=$fdfs
+		local fdfs=$(ls *.fdf)
+                local SYSTEM=${fdfs//.fdf}
                 for f in $fdfs; do
                         included=$(grep include $f)
-                        included=$(echo ${included/"%include"/})
-                        SYSTEM=${SYSTEM/$included/}
+                        included=${included#%include}
+                        included=${included%.fdf*}
+                        included=${included// }
+                        SYSTEM=${SYSTEM/${included}/}
                 done
 		clusterutils report "$(echo $SYSTEM) will be used as the input fdf."
         else
