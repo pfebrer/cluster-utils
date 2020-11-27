@@ -6,7 +6,7 @@ script_path="$3"
 
 # Call .parsedir, which will define the following variables:
 # $directory, $userdirectory, $prefix
-clusterutils --source .parsedir "$what"
+clu .parsedir "$what"
 
 targetdir="${userdirectory}"
 filename="${prefix}_${spec}.sh"

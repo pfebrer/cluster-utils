@@ -3,7 +3,7 @@
 echo ""
 echo "Unmounting and removing all clusters..."
 # Remove all clusters safely
-clusterutils removecluster --all
+clu removecluster --all
 
 # Remove the mounts directory
 # This will only be possible if the directory is empty, in which case
@@ -32,3 +32,5 @@ else
 	echo "     ${CLUSTER_UTILS_MOUNTS}"
        	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"	
 fi
+
+rm "${CLUSTER_UTILS_MOUNTS}/.installed"

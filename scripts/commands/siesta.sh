@@ -1,8 +1,8 @@
 #!/bash/bin
 
 siestasub(){
-	local SIESTA_RUN_SCRIPT=${SIESTA_RUN_SCRIPT:-$(clusterutils getrunner siesta)}
-	local ENV_LOADER=${SIESTA_RUN_SCRIPT:-$(clusterutils getenvloader siesta)}
+	local SIESTA_RUN_SCRIPT=${SIESTA_RUN_SCRIPT:-$(cluget runner siesta)}
+	local ENV_LOADER=${SIESTA_ENV_LOADER:-$(cluget envloader siesta)}
 
 	# Get the fdf file name 
         if [ $# == 0 ] || [[ ! "$(ls *.fdf)" =~ "$1" ]];
@@ -16,7 +16,7 @@ siestasub(){
                         included=${included// }
                         SYSTEM=${SYSTEM/${included}/}
                 done
-		clusterutils report "$(echo $SYSTEM) will be used as the input fdf."
+		clu report "$(echo $SYSTEM) will be used as the input fdf."
         else
                 SYSTEM=$1
                 shift

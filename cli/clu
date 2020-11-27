@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+# PYTHON_ARGCOMPLETE_OK
+
+import argparse
+import argcomplete
+from subcommands import SubCommand
+
+def clu(parsed_args):
+
+    args = vars(parsed_args)
+
+    SubCommand._all[args.pop("subcommand")](**args)
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+
+    subparsers = parser.add_subparsers(dest="subcommand")
+
+    SubCommand.register_all(subparsers)
+
+    argcomplete.autocomplete(parser)
+
+    clu(parser.parse_args())

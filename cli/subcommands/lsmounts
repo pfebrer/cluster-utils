@@ -1,3 +1,0 @@
-#/bin/bash
-
-echo $(ls "${CLUSTER_UTILS_MOUNTS}" 2> /dev/null)
