@@ -7,13 +7,13 @@ describe "Path handling"
 		end
 	end
 
-	describe "clusterutils path command"
+	describe "clu path command"
 		it "Returns correct single paths"
-			assert equal "$(clusterutils path test)" "${CLUSTER_UTILS_ROOT}/test"
+			assert equal "$(clu path test)" "${CLUSTER_UTILS_ROOT}/test"
 		end
 
 		it "Doesn't expand special characters (glob)"
-			assert equal "$(clusterutils path "*")" "${CLUSTER_UTILS_ROOT}/*"
+			assert equal "$(clu path "*")" "${CLUSTER_UTILS_ROOT}/*"
 		end
 	end
 end

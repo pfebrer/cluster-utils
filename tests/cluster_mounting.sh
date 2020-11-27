@@ -11,11 +11,11 @@ end
 
 describe "Mounting"
 	it "Mounts the fake server"
-		fake_yaml=$(clusterutils path fake.yaml)
+		fake_yaml=$(clu path fake.yaml)
 		printf "fakeserver:\n  user:root\n  hostname:localhost\n" > "${fake_yaml}"
-                clusterutils setupcluster "${fake_yaml}" >/dev/null 2>/dev/null
+                clu setupcluster "${fake_yaml}" >/dev/null 2>/dev/null
                 rm "${fake_yaml}"
-		clusterutils mount fakeserver -p 2222
+		clu mount fakeserver -p 2222
 		assert equal "$(ls ${CLUSTER_UTILS_MOUNTS}/fakeserver)" "haha"
 	end
 
@@ -31,8 +31,8 @@ describe "Mounting"
 	end
 
 	it "Removes the fake server"
-		clusterutils removecluster fakeserver
-		assert equal "$(clusterutils lsmounts)" ""
+		clu removecluster fakeserver
+		assert equal "$(clu lsmounts)" ""
 	end
 
 	it "Grants write permissions for empty mounts dir"

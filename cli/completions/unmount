@@ -1,4 +1,0 @@
-#!/bin/bash
-
-compgen -W "$(clusterutils lsmounts)" ${!#%%<<}
-

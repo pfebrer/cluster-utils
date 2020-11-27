@@ -22,7 +22,7 @@ ssh-keygen -f "$HOME/.ssh/known_hosts" -R "[localhost]:2222" >/dev/null 2>/dev/n
 
 # Create an auth_keys file that will be mounted to /root/.ssh/authorized_keys
 # so that we have permission to login (see https://github.com/panubo/docker-sshd)
-auth_keys=$(clusterutils path fakeserver_auth_keys)
+auth_keys=$(clu path fakeserver_auth_keys)
 cat ~/.ssh/id_rsa.pub > ${auth_keys}
 
 # Run the fakeserver (https://github.com/kabirbaidhya/fakeserver) docker image
@@ -32,9 +32,9 @@ docker run -d -p 2222:22 -v "${auth_keys}:/root/.ssh/authorized_keys" -e SSH_USE
 #  Create a copy of the repository for testing
 # ----------------------------------------------
 
-testpath=$(clusterutils path ../.test_cluster-utils)
+testpath=$(clu path ../.test_cluster-utils)
 echo
-echo "Copying clusterutils to ${testpath}..."
+echo "Copying clu to ${testpath}..."
 rm -r --one-file-system "${testpath}" 2>/dev/null
 
 if [ ! -d ${testpath} ]; then
@@ -56,7 +56,7 @@ echo "------------------------------------------------------"
 
 source "${testpath}/activate"
 
-shpec $(clusterutils path "tests/*.sh")
+shpec $(clu path "tests/*.sh")
 tests_exit_code=$?
 
 # --------------------------------------------------
