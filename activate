@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Define the root so that everybody knows how to access files in the cluster-utils package
+export CLUSTER_UTILS_ROOT=$(dirname $(realpath $BASH_SOURCE))
+
 # It is EXTREMELY IMPORTANT that we define the following alias, 
 # since it will prevent accidental removal of all the files inside a mount.
 # Without this protection, if one does "rm -r mounts/" and "mounts" contains 
@@ -8,25 +11,36 @@
 # Note that we implement the extra protection of removing write permissions
 # from the directory where all the mounts are, which will ask you if 
 # you are sure to continue your recursive search (check cli/subcommands/mount).
-alias rm="rm --one-file-system"
-# We also define a function that does exactly the same because
-# aliases are not transmitted to child processes, but exported functions do :)
-# Note: we keep the alias because it's the only way of making it work with a
-# sudo call (see below)
-function rm(){ 
-	command rm --one-file-system "$@" 
-}
-export -f rm
+# However, we are only going to do this if the --one-file-system is accepted by
+# rm. (accepted by gnu core-utils rm, not necessarily the version that a Mac user has)
+_testfile="${CLUSTER_UTILS_ROOT}/.test"
+touch "${_testfile}"
+rm --one-file-system "${_testfile}"
+if [ $? ]; then
+	alias rm="rm --one-file-system"
+	# We also define a function that does exactly the same because
+	# aliases are not transmitted to child processes, but exported functions do :)
+	# Note: we keep the alias because it's the only way of making it work with a
+	# sudo call (see below)
+	function rm(){ 
+		command rm --one-file-system "$@" 
+	}
+	export -f rm
 
-# Then we do this little trick so that sudo also sees the alias
-# (check out https://askubuntu.com/a/22043)
-alias sudo="sudo "
+	# Then we do this little trick so that sudo also sees the alias
+	# (check out https://askubuntu.com/a/22043)
+	alias sudo="sudo "
+else
+	rm ${_testfile}
+fi
 
-# Define the root so that everybody knows how to access files in the cluster-utils package
-export CLUSTER_UTILS_ROOT=$(dirname $(realpath $BASH_SOURCE))
-
-# Activate the clu cli
+# Source all the scripts so that they can be used
+set -a
 source "$CLUSTER_UTILS_ROOT"/scripts/{common,commands,job_schedulers}/*.sh
+set +a
+
+# Provide tab completion for the command line interface (clu)
+_clupycomplete
 
 # Define also the place where the user scripts are expected to be
 # (can be overwritten)

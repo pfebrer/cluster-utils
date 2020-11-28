@@ -1,9 +1,35 @@
-#!/usr/bin/env python
+#!/bin/bash
 # PYTHON_ARGCOMPLETE_OK
 
+# The following is a trick so that the python interpreter can be selected dinamically.
+# It asks 
+# Shell commands follow
+# Next line is bilingual: it starts a comment in Python, and is a no-op in shell
+""":"
+
+# Find a suitable python interpreter (adapt for your specific needs)
+possible_pys="$(_clupyoptions)"
+for cmd in ${possible_pys}; do
+   command -v > /dev/null $cmd && exec $cmd $0 "$@"
+done
+
+echo "No python interpreter found. Tried: ${possible_pys}"
+
+exit 2
+
+":"""
+# Previous line is bilingual: it ends a comment in Python, and is a no-op in shell
+# Shell commands end here
+# Python script follows (example commands shown)
+
 import argparse
-import argcomplete
 from subcommands import SubCommand
+
+try:
+    import argcomplete
+    ARGCOMPLETE_AVAIL = True
+except ModuleNotFoundError:
+    ARGCOMPLETE_AVAIL = False
 
 def clu(parsed_args):
 
@@ -19,6 +45,7 @@ if __name__ == "__main__":
 
     SubCommand.register_all(subparsers)
 
-    argcomplete.autocomplete(parser)
+    if ARGCOMPLETE_AVAIL:
+        argcomplete.autocomplete(parser)
 
     clu(parser.parse_args())

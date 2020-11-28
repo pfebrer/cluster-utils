@@ -48,7 +48,7 @@ def add_config_arguments(subparser):
 def get_hosts(files=None):
 
     if files is None:
-        files = [get_path("clusters.yaml")]
+        files = [get_path("hosts.yaml")]
     
     if not isinstance(files, (str, Path)):
         hosts = {}
@@ -72,7 +72,7 @@ def get_hosts(files=None):
 def write_hosts(hosts, filepath=None):
 
     if filepath is None:
-        filepath = get_path("clusters.yaml")
+        filepath = get_path("hosts.yaml")
     
     with open(filepath, "w") as f:
         yaml.dump(hosts, f)
@@ -111,6 +111,8 @@ def remove_host_ssh_config(host, ssh_config=None):
         line = line.rstrip()
         if f"Host {host}" == line:
             host_block = True
+        elif line.startswith("Host"):
+            host_block = False
 
         if line == "":
             empty_lines += 1
@@ -237,9 +239,8 @@ def setup_host(config=None, **kwargs):
     # Write the parameters to the ssh config file
     ssh_config = Path("~/.ssh/config").expanduser()
     with ssh_config.open("a") as f:
-        f.writelines("\n".join([
-            "",
-            f"Host {config['host']}",
+        f.write("\n".join([
+            f"\nHost {config['host']}",
             f" User {config['user']}",
             f" HostName {config['hostname']}"
         ]))

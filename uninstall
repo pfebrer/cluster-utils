@@ -1,15 +1,17 @@
 #!/bin/bash
 
-echo ""
-echo "Unmounting and removing all clusters..."
-# Remove all clusters safely
-clu removecluster --all
+if [ -d "$(_clupath cli)" ]; then
+	echo ""
+	echo "Unmounting and removing all hosts..."
+	# Remove all hosts safely
+	clu removehost --all
 
-# Remove the mounts directory
-# This will only be possible if the directory is empty, in which case
-# write permissions are already granted (see last lines of the
-# removecluster subcommand)
-rmdir ${CLUSTER_UTILS_MOUNTS}
+	# Remove the mounts directory
+	# This will only be possible if the directory is empty, in which case
+	# write permissions are already granted (see last lines of the
+	# removecluster subcommand)
+	rmdir ${CLUSTER_UTILS_MOUNTS}
+fi
 
 if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
 	# Remove the activation script from .bashrc
@@ -20,17 +22,18 @@ if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
 
 	sed -i "/$startline/,/$endline/d" $BASHRC
 
+	rm "${CLUSTER_UTILS_ROOT}/.installed"
+
 	echo ""
 	echo "Succesful uninstall!"
 	echo ""
 else
 	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-	echo " UNINSTALL ERROR: Some clusters are still mounted"
+	echo " UNINSTALL ERROR: Some hosts are still mounted"
 	echo " even though we tried to automatically unmount them."
 	echo " Please manually unmount all of them and then remove the"
 	echo " mounts folder:"
 	echo "     ${CLUSTER_UTILS_MOUNTS}"
-       	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"	
+    echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"	
 fi
 
-rm "${CLUSTER_UTILS_MOUNTS}/.installed"

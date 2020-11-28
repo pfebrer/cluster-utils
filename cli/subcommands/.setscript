@@ -1,16 +1,1 @@
-#!/bin/bash
 
-what="$1"
-spec="$2"
-script_path="$3"
-
-# Call .parsedir, which will define the following variables:
-# $directory, $userdirectory, $prefix
-clu .parsedir "$what"
-
-targetdir="${userdirectory}"
-filename="${prefix}_${spec}.sh"
-
-mkdir -p "$targetdir"
-
-cp "$script_path" "${targetdir}/${filename}"
