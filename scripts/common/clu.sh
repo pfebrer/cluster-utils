@@ -17,7 +17,6 @@ cluload(){
     fi
 }
 
-
 _clugethost(){
     HOSTNAME=$(hostname)
 
@@ -91,3 +90,42 @@ _clureport(){
     :
     #echo CLUSTER-UTILS: "$@"
 }
+
+_clupyoptions(){
+    echo "${CLUSTER_UTILS_PYTHON} python3 python"
+}
+
+_clupycomplete(){
+    local bin_dir
+    local py_bin
+    local argcomplete_bin
+
+    for possiblepy in $(_clupyoptions); do
+        py_bin="$(which "${possiblepy}")"
+        bin_dir="$(dirname "${py_bin}")"
+        argcomplete_bin="${bin_dir}/register-python-argcomplete"
+        if [ -x "${argcomplete_bin}" ]; then
+            eval "$("${argcomplete_bin}" clu)"
+        fi
+    done
+
+}
+
+clusetscript(){
+    what="$1"
+    spec="$2"
+    script_path="$3"
+
+    # Call .parsedir, which will define the following variables:
+    # $directory, $userdirectory, $prefix
+    _cluparsedir "$what"
+
+    targetdir="${userdirectory}"
+    filename="${prefix}_${spec}.sh"
+
+    mkdir -p "$targetdir"
+
+    cp "$script_path" "${targetdir}/${filename}"
+}
+
+

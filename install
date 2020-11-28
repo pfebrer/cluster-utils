@@ -1,12 +1,12 @@
 #!/bin/bash
 
 INIT_FILE=${INIT_FILE:-$HOME/.bashrc}
-ACTIVATE_SCRIPT="$(dirname $(realpath $BASH_SOURCE))"/activate
+ACTIVATE_SCRIPT="$(dirname $(realpath "${BASH_SOURCE}"))"/activate
+BIN_DIR="$(dirname "${ACTIVATE_SCRIPT}")/bin"
 
-echo "# Added by cluster-utils. Do not modify if you want automatic uninstall" >> $INIT_FILE
-echo "source $ACTIVATE_SCRIPT" >> $INIT_FILE
-echo "# End of cluster-utils" >> $INIT_FILE
+echo "# Added by cluster-utils. Do not modify if you want automatic uninstall" >> "${INIT_FILE}"
+echo "export PATH=${BIN_DIR}:\${PATH}" >> "${INIT_FILE}"
+echo "source $ACTIVATE_SCRIPT" >> "${INIT_FILE}"
+echo "# End of cluster-utils" >> "${INIT_FILE}"
 
-source $ACTIVATE_SCRIPT
-
-touch $(_clupath .installed)
+touch "$(dirname "${ACTIVATE_SCRIPT}")/.installed"
