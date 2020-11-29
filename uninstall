@@ -14,13 +14,13 @@ if [ -d "$(_clupath cli)" ]; then
 fi
 
 if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
-	# Remove the activation script from .bashrc
-	BASHRC=${BASHRC:-$HOME/.bashrc}
+	# Remove the activation script from the init file
+	INIT_FILE=${INIT_FILE:-$HOME/.bashrc}
 
 	startline="# Added by cluster-utils. Do not modify if you want automatic uninstall"
 	endline="# End of cluster-utils"
 
-	sed -i "/$startline/,/$endline/d" $BASHRC
+	sed -i "/$startline/,/$endline/d" "${INIT_FILE}"
 
 	rm "${CLUSTER_UTILS_ROOT}/.installed"
 
