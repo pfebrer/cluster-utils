@@ -18,8 +18,7 @@ export CLUSTER_UTILS_ROOT=${CLUSTER_UTILS_ROOT:-$(dirname $(realpath ${BASH_SOUR
 # rm. (accepted by gnu core-utils rm, not necessarily the version that a Mac user has)
 _testfile="${CLUSTER_UTILS_ROOT}/.test"
 touch "${_testfile}"
-rm --one-file-system "${_testfile}"
-if [ $? ]; then
+if rm --one-file-system "${_testfile}" >/dev/null; then
 	alias rm="rm --one-file-system"
 	# We also define a function that does exactly the same because
 	# aliases are not transmitted to child processes, but exported functions do :)
