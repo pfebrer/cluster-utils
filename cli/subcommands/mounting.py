@@ -1,6 +1,7 @@
 import argparse
 import os, stat
 import getpass
+import platform
 from pathlib import Path
 import subprocess
 
@@ -134,7 +135,12 @@ def unmount(host):
     mounted_in = get_mounts_dir() / host
 
     try:
-        subprocess.run(["fusermount", "-zu", str(mounted_in)]).check_returncode()
+        OS = platform.system()
+        if OS == "Darwin":
+            commands = ["umount", str(mounted_in)]
+        else:
+            commands = ["fusermount", "-zu", str(mounted_in)]
+        subprocess.run(commands).check_returncode()
     except subprocess.CalledProcessError:
         pass
     else:
