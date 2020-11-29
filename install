@@ -13,7 +13,7 @@ if [[ $SHELL == *"bash" ]]; then
     elif [[ "$unamestr" == 'Darwin' ]]; then
     DEFAULT_INIT="$HOME/.bash_profile"
     fi
-elif [[ $SHELL == *"zsh" ]]
+elif [[ $SHELL == *"zsh" ]]; then
     DEFAULT_INIT="$HOME/.zshrc"
 fi
 
