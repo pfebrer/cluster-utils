@@ -63,7 +63,7 @@ def lsmounts():
     print(" ".join(get_mounted()))
 
 @_multiple_hosts()
-def mount(host):
+def mount(host, args):
     """
     Mounts hosts into the mounts directory.
 
@@ -106,10 +106,15 @@ def mount(host):
     subprocess.run(
         ["sshfs",
          "-o", "ServerAliveInterval=5,ServerAliveCountMax=2,ConnectTimeout=3,ConnectionAttempts=1",
+         *args,
          get_mount_adress(host, mount_target=True), str(host_mnt)]
     )
 
-    os.chdir(host_mnt)
+def _arguments_mount(subparser):
+    mount.argument_gen(subparser)
+    
+    subparser.add_argument("args", nargs=argparse.REMAINDER, 
+        help="Additional args (options) that go into the sshfs command").completer = lambda *args, **kwargs: ""
 
 @_multiple_hosts(all_getter=get_mounted)
 def unmount(host):
@@ -129,7 +134,7 @@ def unmount(host):
     mounted_in = get_mounts_dir() / host
 
     try:
-        subprocess.run(["fusermount", "-u", str(mounted_in)]).check_returncode()
+        subprocess.run(["fusermount", "-zu", str(mounted_in)]).check_returncode()
     except subprocess.CalledProcessError:
         pass
     else:
@@ -176,7 +181,6 @@ def fssh(command=None):
     else:
         subprocess.run(["ssh", host, f'cd {remote_dir}; {" ".join(command)}'])
 
-
 def _arguments_fssh(subparser):
     subparser.add_argument("command", nargs=argparse.REMAINDER, help="Command that you want to execute on this folder on the host."
         "If not provided, you will be left with a terminal at the remote directory")
@@ -185,6 +189,6 @@ def _arguments_fssh(subparser):
         " in the equivalent REMOTE folder."
 
 SubCommand(lsmounts)
-SubCommand(mount, mount.argument_gen)
+SubCommand(mount, _arguments_mount)
 SubCommand(unmount, unmount.argument_gen)
 SubCommand(fssh, _arguments_fssh)
