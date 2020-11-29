@@ -15,7 +15,19 @@ fi
 
 if [ ! -d "${CLUSTER_UTILS_MOUNTS}" ]; then
 	# Remove the activation script from the init file
-	INIT_FILE=${INIT_FILE:-$HOME/.bashrc}
+	# Get the init file
+	unamestr=`uname`
+	if [[ $SHELL == *"bash" ]]; then
+		if [[ "$unamestr" == 'Linux' ]]; then
+		DEFAULT_INIT="$HOME/.bashrc"
+		elif [[ "$unamestr" == 'Darwin' ]]; then
+		DEFAULT_INIT="$HOME/.bash_profile"
+		fi
+	elif [[ $SHELL == *"zsh" ]]
+		DEFAULT_INIT="$HOME/.zshrc"
+	fi
+
+	INIT_FILE=${INIT_FILE:-$DEFAULT_INIT}
 
 	startline="# Added by cluster-utils. Do not modify if you want automatic uninstall"
 	endline="# End of cluster-utils"

@@ -5,7 +5,19 @@ realpath(){
    echo "$(cd $(dirname "$1");pwd)/$(basename "$1")"
 }
 
-INIT_FILE=${INIT_FILE:-$HOME/.bashrc}
+# Get the init file
+unamestr=`uname`
+if [[ $SHELL == *"bash" ]]; then
+    if [[ "$unamestr" == 'Linux' ]]; then
+    DEFAULT_INIT="$HOME/.bashrc"
+    elif [[ "$unamestr" == 'Darwin' ]]; then
+    DEFAULT_INIT="$HOME/.bash_profile"
+    fi
+elif [[ $SHELL == *"zsh" ]]
+    DEFAULT_INIT="$HOME/.zshrc"
+fi
+
+INIT_FILE=${INIT_FILE:-$DEFAULT_INIT}
 ROOT="$(dirname $(realpath "$0"))"
 
 echo "# Added by cluster-utils. Do not modify if you want automatic uninstall" >> "${INIT_FILE}"
