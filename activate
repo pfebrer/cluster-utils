@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Define the root so that everybody knows how to access files in the cluster-utils package
-export CLUSTER_UTILS_ROOT=$(dirname $(realpath $BASH_SOURCE))
+# To avoid problems with shells other than bash (e.g. zsh, mac's default from now on),
+# in install we define the root using $0 and we pass it to this script when we source it.
+# Note that we do this because $0 does not contain the path of the file when sourcing
+export CLUSTER_UTILS_ROOT=${CLUSTER_UTILS_ROOT:-$(dirname $(realpath ${BASH_SOURCE}))}
 
 # It is EXTREMELY IMPORTANT that we define the following alias, 
 # since it will prevent accidental removal of all the files inside a mount.
@@ -38,6 +41,9 @@ fi
 set -a
 source "$CLUSTER_UTILS_ROOT"/scripts/{common,commands,job_schedulers}/*.sh
 set +a
+
+# Add the bin folder to the path
+export PATH="$(_clupath bin):$PATH"
 
 # Provide tab completion for the command line interface (clu)
 _clupycomplete

@@ -2,7 +2,6 @@
 # PYTHON_ARGCOMPLETE_OK
 
 # The following is a trick so that the python interpreter can be selected dinamically.
-# It asks 
 # Shell commands follow
 # Next line is bilingual: it starts a comment in Python, and is a no-op in shell
 """:"

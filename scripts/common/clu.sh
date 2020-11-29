@@ -111,21 +111,33 @@ _clupycomplete(){
 
 }
 
-clusetscript(){
-    what="$1"
-    spec="$2"
-    script_path="$3"
+_clusetscript(){
+    local what="$1"
+    local spec="$2"
+    local script_path="$3"
 
     # Call .parsedir, which will define the following variables:
     # $directory, $userdirectory, $prefix
     _cluparsedir "$what"
 
-    targetdir="${userdirectory}"
-    filename="${prefix}_${spec}.sh"
+    local targetdir="${userdirectory}"
+    local filename="${prefix}_${spec}.sh"
 
     mkdir -p "$targetdir"
 
     cp "$script_path" "${targetdir}/${filename}"
+}
+
+clusetenvloader(){
+    _clusetscript env_loader "$@"
+}
+
+clusetrunner(){
+    _clusetscript runner "$@"
+}
+
+clucd(){
+    cd "${CLUSTER_UTILS_MOUNTS}/$1"
 }
 
 

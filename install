@@ -1,12 +1,16 @@
 #!/bin/bash
 
+# Mac does not necessarily have a realpath command, so we define it here 
+realpath(){    
+   echo "$(cd $(dirname "$1");pwd)/$(basename "$1")"
+}
+
 INIT_FILE=${INIT_FILE:-$HOME/.bashrc}
-ACTIVATE_SCRIPT="$(dirname $(realpath "${BASH_SOURCE}"))"/activate
-BIN_DIR="$(dirname "${ACTIVATE_SCRIPT}")/bin"
+ROOT="$(dirname $(realpath "$0"))"
 
 echo "# Added by cluster-utils. Do not modify if you want automatic uninstall" >> "${INIT_FILE}"
-echo "export PATH=${BIN_DIR}:\${PATH}" >> "${INIT_FILE}"
-echo "source $ACTIVATE_SCRIPT" >> "${INIT_FILE}"
+echo "export CLUSTER_UTILS_ROOT=${ROOT}" >> "${INIT_FILE}"
+echo "source \"\${CLUSTER_UTILS_ROOT}/activate\"" >> "${INIT_FILE}"
 echo "# End of cluster-utils" >> "${INIT_FILE}"
 
-touch "$(dirname "${ACTIVATE_SCRIPT}")/.installed"
+touch "${ROOT}/.installed"

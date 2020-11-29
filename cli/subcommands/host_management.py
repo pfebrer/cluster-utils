@@ -2,12 +2,13 @@ from functools import wraps
 from pathlib import Path
 import getpass
 import subprocess
+import shutil
 import yaml
 
 from .path import get_path
 from .subcommand import SubCommand
 
-__all__ = ["send_key", "setup_host", "remove_host"]
+__all__ = ["send_keys", "setup_host", "remove_host"]
 
 KNOWN_CONFIG_KEYS = {
     "host": {
@@ -33,11 +34,25 @@ KNOWN_CONFIG_KEYS = {
     },
     "mount_target": {
         "description": "The directory of the remote host that you want to be mounted into your filesystem. Unless"\
-            " you have a good reason, this is by default the home directory (leave it empty)"
+            " you have a good reason, this is by default the home directory (leave it empty)",
+        "default": lambda key, config: ""
+    },
+    "host_auth_keys": {
+        "description": "The path to the file where the host keeps register of authorized keys. The default should be fine"\
+            " unless the cluster administrators are doing some fancy non-standard stuff",
+        "default": lambda key, config: "~/.ssh/authorized_keys"
     },
     "clusterutils_dir": {
         "description": "The directory that clusterutils will use to save scripts and commands in this host.",
         "default": lambda key, config: "~/.cluster-utils"
+    },
+    "jump_through":{
+        "description": "In some occasions, you can not ssh directly to your host, but you need to jump through another"\
+            " server. This is the NAME OF THE HOST TO USE AS AN INTERMEDIATE STEP. If you set this to a not known host,"\
+            " we will go on to set it up before finishing to set up this host."\
+            " Notice that you can use as many jumping steps as you need. Also, you can use a host normally and as a 'jump_through'"\
+            " at the same time.",
+        "default": lambda key, config: ""
     }
 }
 
@@ -93,6 +108,18 @@ def remove_hosts_yaml(hosts):
         del hosts_dict[host]
 
     write_hosts(hosts_dict) 
+
+def write_host_ssh(config):
+    # Write the parameters to the ssh config file
+    ssh_config = Path("~/.ssh/config").expanduser()
+    with ssh_config.open("a") as f:
+        f.write("\n".join([
+            f"\n\nHost {config['host']}",
+            f" User {config['user']}",
+            f" HostName {config['hostname']}"
+        ]))
+        if config.get("jump_through"):
+            f.write(f"\n ProxyJump {config['jump_through']}")
 
 def remove_host_ssh_config(host, ssh_config=None):
 
@@ -170,7 +197,7 @@ def lshosts():
     print(" ".join(list(get_hosts())))
 
 @_multiple_hosts()
-def send_key(host, t="ecdsa", bits=None):
+def send_keys(host, t="rsa", bits=None):
     """
     Sends the SSH key of this computer to the host. 
     
@@ -192,15 +219,30 @@ def send_key(host, t="ecdsa", bits=None):
         if not public_keys.exists():
             return
 
-    subprocess.run(["ssh-copy-id", "-i", public_keys, host if isinstance(host, str) else host[0]])
+    config = get_hosts()[host]
+
+    try:
+        if config["host_auth_keys"] != "~/.ssh/authorized_keys" or shutil.which("ssh-copy-id") is None:
+            process = subprocess.Popen(('cat', public_keys), stdout=subprocess.PIPE)
+            output = subprocess.check_output(('ssh', host, f"cat >> {config['host_auth_keys']}"), stdin=process.stdout)
+            process.wait()
+        else:
+            process = subprocess.run(["ssh-copy-id", "-i", public_keys, host])
+            process.check_returncode()
+        return True
+    except:
+        return False
+
+def move_key_in_host(host, path):
+    subprocess.run(["ssh", host, f"cp ~/.ssh/authorized_keys {path}"])
 
 def _arguments_sendkey(subparser):
-    send_key.argument_gen(subparser)
+    send_keys.argument_gen(subparser)
 
-    subparser.add_argument("-t", default="ecdsa",
+    subparser.add_argument("-t", default="rsa",
         help="The encryption algorithm used to generate the key. See https://www.ssh.com/ssh/keygen/.")
 
-def setup_host(config=None, **kwargs):
+def setup_host(config=None, use_defaults=False, no_conn=False, **kwargs):
     from .script_management import setup_host_scripts
 
     if config is None or config == []:
@@ -212,44 +254,55 @@ def setup_host(config=None, **kwargs):
         for name, config_vals in hosts_dict.items():
             if "host" not in config_vals:
                 config_vals["host"] = name
-            setup_host(config=config_vals, **kwargs)
+            setup_host(config=config_vals, use_defaults=use_defaults, no_conn=no_conn, **kwargs)
         return
 
     current_hosts = get_hosts()
 
     config.update({key: val for key, val in kwargs.items() if val is not None})
 
-    print("Following, we will ask for the parameters of this host:")
-    print("Enter '?' for a help message.")
-    for key, specs in KNOWN_CONFIG_KEYS.items():
-        if config.get(key) is None:
-            default = specs.get("default", lambda key, config: "")(key, config)
+    def _ask_for_value(key, specs):
+
+        default = specs.get("default", lambda key, config: None)(key, config)
+        if use_defaults and key not in config:
+            config[key] = default
+
+        val = config.get(key)
+        if val is None:
+            
             description = specs.get("description", "")
 
-            val = None
             while val is None or val == "?":
                 if val is not None:
                     print(f"\t({description})")
-                val = input(f" - {key} ({default}): ")
-            print("\033[K", end="")
-            config[key] = val or default
+                val = input(f" - {key} ({default or ''}): ")
+            config[key] = val or default or ""
         else:
             print(f" - {key}: {config[key]}")
 
-    # Write the parameters to the ssh config file
-    ssh_config = Path("~/.ssh/config").expanduser()
-    with ssh_config.open("a") as f:
-        f.write("\n".join([
-            f"\nHost {config['host']}",
-            f" User {config['user']}",
-            f" HostName {config['hostname']}"
-        ]))
+    print("Following, we will ask for the parameters of this host:")
+    print("Enter '?' for a help message.")
+    for key, specs in KNOWN_CONFIG_KEYS.items():
+        _ask_for_value(key, specs)
+
+    jump_through = config.get("jump_through")
+    if jump_through and jump_through not in current_hosts:
+        setup_host(host=jump_through)
+
+    write_host_ssh(config)
 
     add_hosts({config["host"]: config})
 
-    send_key(config["host"])
+    if no_conn:
+        return True
 
-    setup_host_scripts(config["host"])
+    if send_keys(config["host"]):
+        setup_host_scripts(config["host"])
+    else:
+        print("(cluster-utils) WE COULD NOT SEND THE KEYS. Therefore we will not try to setup scripts in the host.")
+        print(" When there is connection, you can try again:")
+        print(f"     clu sendkeys {config['host']}")
+        print(f"     clu setuphost {config['host']}")
 
 def _file_extension_completer_gen(extension=""):
 
@@ -262,6 +315,16 @@ def _arguments_setuphost(subparser):
     subparser.add_argument("--config", nargs="*").completer = _file_extension_completer_gen("y?ml")
 
     add_config_arguments(subparser)
+
+    subparser.add_argument("--use-defaults", action="store_true", help="If a default can be generated, the value for that"\
+        " setting won't be asked. This is specially useful when setting up hosts with an incomplete yaml file to avoid prompts,"
+        " but possibly not advisable if you are setting it up interactively."
+    )
+
+    subparser.add_argument("--no-conn", action="store_true", help="If set, clu understands that it should not try to connect"\
+        " to the host and will skip the steps of sending ssh keys and setting up the scripts in the host. Useful when you don't"\
+        " have a working connection to them or for testing"
+    )
 
 @_multiple_hosts()
 def remove_host(host):
@@ -305,7 +368,8 @@ def _arguments_update_host(subparser):
 
     add_config_arguments(subparser) 
 
-SubCommand(send_key, _arguments_sendkey, name="sendkey")
+SubCommand(lshosts)
+SubCommand(send_keys, _arguments_sendkey, name="sendkeys")
 SubCommand(setup_host, _arguments_setuphost, name="setuphost")
 SubCommand(remove_host, remove_host.argument_gen, name="removehost")
 SubCommand(update_host_config, _arguments_update_host, name="updatehostconfig")

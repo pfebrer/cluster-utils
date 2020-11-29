@@ -3,7 +3,7 @@ describe "Path handling"
 	describe "On activate"
 		it "Defines CLUSTER_UTILS_ROOT appropiately"
 			testsdir="$(dirname $(realpath "$BASH_SOURCE"))"
-			assert equal "${CLUSTER_UTILS_ROOT}" "$(realpath "${testsdir}/..")"
+			assert equal "$(realpath "${CLUSTER_UTILS_ROOT}")" "$(realpath "${testsdir}/..")"
 		end
 	end
 
