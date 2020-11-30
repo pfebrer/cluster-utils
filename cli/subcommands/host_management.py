@@ -134,6 +134,7 @@ def remove_host_ssh_config(host, ssh_config=None):
     host_block = False
     empty_lines = 0
     new_lines = []
+    line = ""
     for line in lines:
         line = line.rstrip()
         if f"Host {host}" == line:
