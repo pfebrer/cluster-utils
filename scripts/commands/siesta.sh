@@ -16,7 +16,7 @@ siestasub(){
                         included=${included// }
                         SYSTEM=${SYSTEM/${included}/}
                 done
-		clu report "$(echo $SYSTEM) will be used as the input fdf."
+		_clureport "$(echo $SYSTEM) will be used as the input fdf."
         else
                 SYSTEM=$1
                 shift
