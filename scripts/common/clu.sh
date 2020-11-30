@@ -101,7 +101,7 @@ _clupycomplete(){
     local argcomplete_bin
 
     for possiblepy in $(_clupyoptions); do
-        py_bin="$(which "${possiblepy}")"
+        py_bin="$(which "${possiblepy}" 2>/dev/null)"
         bin_dir="$(dirname "${py_bin}")"
         argcomplete_bin="${bin_dir}/register-python-argcomplete"
         if [ -x "${argcomplete_bin}" ]; then

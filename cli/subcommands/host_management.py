@@ -169,10 +169,12 @@ def _multiple_hosts(all_getter=get_hosts):
             else:
                 hosts = [host] if isinstance(host, str) else host
 
-            for host in hosts:
-                function(host, **kwargs)
+            returns = [function(host, **kwargs) for host in hosts]
+            
+            if len(returns) == 1:
+                returns = returns[0]
 
-            return
+            return returns
         
         def argument_gen(subparser):
             subparser.add_argument(

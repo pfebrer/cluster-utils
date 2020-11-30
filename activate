@@ -38,7 +38,9 @@ fi
 
 # Source all the scripts so that they can be used
 set -a
-source "$CLUSTER_UTILS_ROOT"/scripts/{common,commands,job_schedulers}/*.sh
+for file in "${CLUSTER_UTILS_ROOT}"/scripts/{common,commands,job_schedulers}/*.sh; do
+	source "${file}"
+done
 set +a
 
 # Add the bin folder to the path
