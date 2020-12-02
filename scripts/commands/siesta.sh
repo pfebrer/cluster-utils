@@ -2,7 +2,7 @@
 
 siestasub(){
 	local SIESTA_RUN_SCRIPT=${SIESTA_RUN_SCRIPT:-$(cluget runner siesta)}
-	local ENV_LOADER=${SIESTA_ENV_LOADER:-$(cluget envloader siesta)}
+	local ENV_LOADER=${SIESTA_ENV_LOADER:-$(cluget env_loader siesta)}
 
 	# Get the fdf file name 
         if [ $# == 0 ] || [[ ! "$(ls *.fdf)" =~ "$1" ]];
