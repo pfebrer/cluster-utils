@@ -50,7 +50,7 @@ cluget(){
     #	4. Cluster-utils provided, generic.
     #	5. spec provided was a full path to the file
     local candidates=" ${userdirectory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh"
-    candidates+="$(_clupath ${directory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh)"
+    candidates+=" $(_clupath ${directory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh)"
     candidates+=" ${userdirectory}/${prefix}_$2.sh"
     candidates+=" $(_clupath ${directory}/${prefix}_$2.sh)"
     candidates+=" $2"
