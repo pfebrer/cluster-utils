@@ -77,11 +77,7 @@ Then execute the install script
 ```
 cluster-utils/install
 ```
-**Note:** Currently the install script is only setup for `bash`, so if you have another default shell you will need to specify the initialization file.
-E.g. if your default shell is `zsh` (new versions of MacOS):
-```
-INIT_FILE=~/.zshrc cluster-utils/install
-```
+**Note:** It will work in Mac and Linux for `bash` and `zsh`, so if you have another default shell you will need to specify the initialization file using the INIT_FILE environment variable.
 
 Similarly run the uninstall script to uninstall:
 ```
