@@ -36,10 +36,14 @@ else
 	rm ${_testfile}
 fi
 
-# Source all the scripts so that they can be used
+# Source all the scripts so that they can be used. If we are in the main computer, we are going
+# to use the "generic" folder. If we are in a host, only the relevant scripts are set, therefore
+# there's only one level and we use ".".
 set -a
-for file in "${CLUSTER_UTILS_ROOT}"/scripts/{common,commands,job_schedulers}/*.sh; do
-	source "${file}"
+for file in "${CLUSTER_UTILS_ROOT}"/scripts/{generic,.}/commands/*.sh; do
+	if [ -f "${file}" ]; then
+		source "${file}"
+	fi
 done
 set +a
 

@@ -25,5 +25,5 @@ siestasub(){
 
 	if [[ -z ${SYSTEM// } ]]; then return 1; fi
 
-        ENV_LOADER=$ENV_LOADER SYSTEM=$SYSTEM jobsub -J "$SYSTEM" "$@" $SIESTA_RUN_SCRIPT
+        ENV_LOADER=$ENV_LOADER SYSTEM=$SYSTEM JOB_NAME=$SYSTEM jobsub "$@" $SIESTA_RUN_SCRIPT
 }

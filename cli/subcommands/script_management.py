@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import subprocess
 
 from .host_management import _multiple_hosts, get_hosts
@@ -7,7 +9,19 @@ from .subcommand import SubCommand
 
 __all__ = ["setup_host_scripts"]
 
-_TOCOPY = ["scripts", "user-scripts", "activate", "install", "uninstall"]
+_TOCOPY = ["activate", "install", "uninstall"]
+
+def get_scripts_paths(host):
+    # Get the cluster utils provided scripts and the user defined ones
+    scripts_dir = get_path("scripts")
+    user_scripts_dir = Path(os.environ.get("CLUSTER_UTILS_USERSCRIPTS"))
+
+    # Generate the list of "candidates". If some script is in more than one candidate
+    # the LAST ONE WILL SURVIVE.
+    candidates = [ scripts_dir / "generic", user_scripts_dir / "generic", 
+        scripts_dir / "host-specific" / host,  user_scripts_dir / "host-specific" / host ]
+
+    return candidates
 
 @_multiple_hosts()
 def setup_host_scripts(host):
@@ -20,9 +34,17 @@ def setup_host_scripts(host):
 
     clu_dir = host_config["clusterutils_dir"]
 
-    subprocess.run(["ssh", host, f"if [ -d {clu_dir} ]; then rm -r {clu_dir}/" + "{" + f"{','.join(_TOCOPY)}"+ "}" + f"; else mkdir -p {clu_dir}; fi"])
-    subprocess.run(["scp", "-r", *[str(get_path(d)) for d in _TOCOPY ],
-        get_mount_adress(host, mount_target=host_config["clusterutils_dir"])])
+    subprocess.run(["ssh", host, f"if [ -f {clu_dir}/.installed ]; then {clu_dir}/uninstall > /dev/null; fi;"\
+        f"if [ -d {clu_dir} ]; then rm -r {clu_dir}/" + "{" + f"{','.join(_TOCOPY)}"+ ",scripts}" + f"; fi;"\
+        f"mkdir -p {clu_dir}/scripts"]
+    )
+    
+    cluster_utils_remote = get_mount_adress(host, mount_target=host_config["clusterutils_dir"])
+    # Copy files
+    subprocess.run(["scp", "-r", *[str(get_path(d)) for d in _TOCOPY], cluster_utils_remote])
+    # Copy scripts
+    subprocess.run(["scp", "-r", *[str(path) for dr in get_scripts_paths(host) for path in dr.glob("*")], cluster_utils_remote + "/scripts"])
+
     subprocess.run(["ssh", host, f"if [ ! -f {clu_dir}/.installed ]; then {clu_dir}/install; fi"])
 
 # def set_script(what, target, path, host=None, global_=False):

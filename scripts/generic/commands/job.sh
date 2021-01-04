@@ -11,6 +11,14 @@ jobcd(){
 	cd $JOBDIR
 }
 
-jobsub(){ 
-	sbatch --export=ALL --no-requeue "$@"
+jobsub(){
+
+	JOB_NAME=${JOB_NAME:-job}
+
+	if which sbatch 2>/dev/null; then
+		sbatch --export=ALL --no-requeue -J $JOB_NAME "$@"
+	else
+		qsub -V -N $JOB_NAME "$@"
+	fi
+
 }

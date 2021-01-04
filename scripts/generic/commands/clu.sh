@@ -49,24 +49,24 @@ cluget(){
     #	3. User directory, generic
     #	4. Cluster-utils provided, generic.
     #	5. spec provided was a full path to the file
-    local candidates=" ${userdirectory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh"
-    candidates+=" $(_clupath ${directory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh)"
-    candidates+=" ${userdirectory}/${prefix}_$2.sh"
-    candidates+=" $(_clupath ${directory}/${prefix}_$2.sh)"
-    candidates+=" $2"
+    # local candidates=" ${userdirectory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh"
+    # candidates+=" $(_clupath ${directory}/${CLUSTER_UTILS_HOST}/${prefix}_$2.sh)"
+    # candidates+=" ${userdirectory}/${prefix}_$2.sh"
+    # candidates+=" $(_clupath ${directory}/${prefix}_$2.sh)"
+    # candidates+=" $2"
 
-    local winner=
+    # local winner=
 
-    for candidate in $candidates; do
-        if [ -f $candidate ]; then
-            winner=$candidate
-            break
-        fi
-    done
+    # for candidate in $candidates; do
+    #     if [ -f $candidate ]; then
+    #         winner=$candidate
+    #         break
+    #     fi
+    # done
 
-    _clureport debug "Requested ${what} <$2> on ${CLUSTER_UTILS_HOST}. Found: ${winner}. Candidates were: ${candidates}"
+    #_clureport debug "Requested ${what} <$2> on ${CLUSTER_UTILS_HOST}. Found: ${winner}. Candidates were: ${candidates}"
 
-    echo "${winner}"
+    echo "$(_clupath ${directory}/${prefix}_$2.sh)"
 }
 
 _cluparseget(){
@@ -109,31 +109,6 @@ _clupycomplete(){
         fi
     done
 
-}
-
-_clusetscript(){
-    local what="$1"
-    local spec="$2"
-    local script_path="$3"
-
-    # Call .parsedir, which will define the following variables:
-    # $directory, $userdirectory, $prefix
-    _cluparsedir "$what"
-
-    local targetdir="${userdirectory}"
-    local filename="${prefix}_${spec}.sh"
-
-    mkdir -p "$targetdir"
-
-    cp "$script_path" "${targetdir}/${filename}"
-}
-
-clusetenvloader(){
-    _clusetscript env_loader "$@"
-}
-
-clusetrunner(){
-    _clusetscript runner "$@"
 }
 
 clucd(){
