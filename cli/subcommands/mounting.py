@@ -162,11 +162,26 @@ def remove_mount_point(host):
     if len(list(mounts_dir.glob("*"))) > 0:
         _write_permissions(mounts_dir, False)
 
-def fssh(command=None):
+def get_host_from_path(path=""):
     """
-    If inside a mountpoint, ssh into the equivalent remote directory.
+    Given a path, returns the mounted host to which that path belongs.
+
+    It also returns the path of the remote that is equivalent.
+
+    Parameters
+    ------------
+    path: str or Path, optional
+        The path for which we want the above mentioned returns. Defaults to the cwd.
+
+    Returns
+    -----------
+    str:
+        The name of the host
+    Path:
+        Remote path that corresponds to the given local path.
     """
-    current_path = Path().resolve()
+
+    current_path = Path(path).resolve()
     mounts_dir = get_mounts_dir()
 
     if mounts_dir not in current_path.parents:
@@ -181,6 +196,14 @@ def fssh(command=None):
     remote_root = Path(hosts[host].get("mount_target", ""))
 
     remote_dir = remote_root / current_path.relative_to(host_dir)
+
+    return host, remote_dir
+
+def fssh(command=None):
+    """
+    If inside a mountpoint, ssh into the equivalent remote directory.
+    """
+    host, remote_dir = get_host_from_path()
 
     if command is None or command == []:
         subprocess.run(["ssh", host, "-t", f'bash --init-file <(echo \". \$HOME/.bash_profile; cd {remote_dir}\")'])
