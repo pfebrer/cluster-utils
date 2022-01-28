@@ -3,7 +3,7 @@
 source $ENV_LOADER
 
 ulimit -l unlimited
-ulimit -s 51200
+ulimit -s unlimited
 ulimit -n 51200
 
 SIESTA=${SIESTA:-siesta}

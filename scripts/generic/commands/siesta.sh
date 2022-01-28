@@ -9,12 +9,13 @@ siestasub(){
         then
 		local fdfs=$(ls *.fdf)
                 local SYSTEM=${fdfs//.fdf}
-                for f in $fdfs; do
+		for f in $fdfs; do
                         included=$(grep include $f)
-                        included=${included#%include}
-                        included=${included%.fdf*}
-                        included=${included// }
-                        SYSTEM=${SYSTEM/${included}/}
+                        included=${included//%include/}
+                        included=${included//.fdf/}
+                        for word in $included; do
+                                SYSTEM=${SYSTEM//${word}/};
+                        done
                 done
 		_clureport "$(echo $SYSTEM) will be used as the input fdf."
         else
