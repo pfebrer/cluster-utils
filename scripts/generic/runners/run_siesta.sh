@@ -8,5 +8,6 @@ ulimit -n 51200
 
 SIESTA=${SIESTA:-siesta}
 SYSTEM=${SYSTEM:-$1}
+SIESTA_MPIRUN=${SIESTA_MPIRUN:mpirun}
 
-'mpirun' $SIESTA < $SYSTEM'.fdf' > $SYSTEM'.out' 
+${SIESTA_MPIRUN} $SIESTA < $SYSTEM'.fdf' > $SYSTEM'.out' 
